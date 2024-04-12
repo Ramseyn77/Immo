@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('numero_IFU')->nullable() ;
             $table->string('profil') ;
             $table->boolean('email_verified_at')->default(0);
-            $table->boolean('status')->default(0) ;
+            $table->string('status')->default(0) ;
             $table->rememberToken();
             $table->softDeletes() ;
             $table->timestamps();

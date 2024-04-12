@@ -13,7 +13,9 @@ class CategorieController extends Controller
     public function index()
     {
         $categories = Categorie::all() ;
-        dd($categories) ;
+        return response()->json([
+            'categories' => $categories,
+        ],200) ;
     }
 
     /**
@@ -23,7 +25,9 @@ class CategorieController extends Controller
     {
         $categorie = Categorie::findOrFail($category) ;
         $posts = $categorie->posts ;
-       dd($posts) ;
+        return response()->json([
+            'posts' => $posts,
+        ],200) ;
     }
 
     /**
@@ -34,7 +38,18 @@ class CategorieController extends Controller
         $request->validate([
             'name' => 'required|unique:categories'
         ]) ;
-        $categorie = Categorie::create($request->all()) ;
+
+        try {
+            $categorie = Categorie::create($request->all()) ;
+            return response()->json([
+                'message' => "Categorie successfully created"
+            ],200) ;
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => "Something really went wrong"
+            ],500) ;
+        }
+        
     }
 
     /**
@@ -43,6 +58,15 @@ class CategorieController extends Controller
     public function show($category)
     {
         $categorie = Categorie::findOrFail($category) ;
+        if(!$categorie){
+            return response()->json([
+                'error' => 'Ressource Not found'
+            ],404) ;
+        }
+
+        return response()->json([
+            'categorie' => $categorie
+        ],200) ;
     }
 
     /**
@@ -61,8 +85,19 @@ class CategorieController extends Controller
         $request->validate([
             'name' => 'required'
         ]) ;
-        $categorie = Categorie::findOrFail($category) ;
-        $categorie->update($request->all()) ;
+        try {
+            $categorie = Categorie::findOrFail($category) ;
+            $categorie->update($request->all()) ;
+            return response()->json([
+                'message' => "Categorie successfully updated"
+            ],200) ;
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => "Something really went wrong"
+            ],500) ;
+        }
+       
+        
     }
 
     /**
@@ -72,5 +107,8 @@ class CategorieController extends Controller
     {
         $categorie = Categorie::findOrFail($category) ;
         $categorie->delete() ;
+        return response()->json([
+            'message' => "Categorie successfully deleted"
+        ],200) ;
     }
 }

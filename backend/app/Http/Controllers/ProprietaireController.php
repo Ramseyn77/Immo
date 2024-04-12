@@ -13,9 +13,10 @@ class ProprietaireController extends Controller
      */
     public function index()
     {
-        $proprietaires = Proprietaire::all() ;
-        dd($proprietaires) ;
-       
+        $owners = Proprietaire::leftJoin('users','proprietaires.user_id','=','users.id')->get() ;
+        return response()->json([
+            'owners' => $owners,
+        ],200) ;
     }
 
     /**
@@ -25,7 +26,9 @@ class ProprietaireController extends Controller
     {
         $user = User::findOrFail($id) ;
         $posts = $user->posts ;
-        dd($posts) ;
+        return response()->json([
+            'posts' => $posts,
+        ],200) ;
     }
 
     /**
@@ -42,7 +45,9 @@ class ProprietaireController extends Controller
     public function show($proprietaire)
     {
         $owner = Proprietaire::findOrFail($proprietaire) ;
-        dd($owner->user) ;
+        return response()->json([
+            'owner' => $owner->user,
+        ],200) ;
     }
 
     /**
@@ -68,6 +73,8 @@ class ProprietaireController extends Controller
     {
         $owner = Proprietaire::findOrFail($proprietaire) ;
         $owner->delete() ;
-        dd($owner) ;
+        return response()->json([
+            'message' => 'Proprietaire successfully deleted'
+        ],200) ;
     }
 }

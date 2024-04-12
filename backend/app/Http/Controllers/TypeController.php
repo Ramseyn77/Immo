@@ -14,7 +14,9 @@ class TypeController extends Controller
     public function index()
     {
         $types = Type::all() ;
-        dd($types) ;
+        return response()->json([
+            'types' => $types,
+        ],200) ;
     }
 
     /**
@@ -24,7 +26,9 @@ class TypeController extends Controller
     {
         $typ = Type::findOrFail($type) ;
         $posts = $typ->posts ;
-        dd($posts) ;
+        return response()->json([
+            'posts' => $posts,
+        ],200) ;
     }
 
     /**
@@ -35,7 +39,17 @@ class TypeController extends Controller
         $request->validate([
             'name' => 'required|unique:types'
         ]) ;
-        $type = Type::create($request->all()) ;
+       
+        try {
+            $type = Type::create($request->all()) ;
+            return response()->json([
+                'message' => 'Type successfully created'
+            ],200) ;
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Something really went wrong'
+            ],500) ;
+        }
     }
 
     /**
@@ -44,6 +58,15 @@ class TypeController extends Controller
     public function show($type)
     {
         $typ = Type::findOrFail($type) ;
+        if(!$typ){
+            return response()->json([
+                'error' => 'Ressource Not found'
+            ],404) ;
+        }
+
+        return response()->json([
+            'type' => $typ
+        ],200) ;
     }
 
     /**
@@ -62,8 +85,17 @@ class TypeController extends Controller
         $request->validate([
             'name' => 'required'
         ]) ;
-        $typ = Type::findOrFail($type) ;
-        $typ->update($request->all()) ;
+       try {
+            $typ = Type::findOrFail($type) ;
+            $typ->update($request->all()) ;
+            return response()->json([
+                'message' => 'Type successfully updated'
+            ],200) ;
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Something really went wrong'
+            ],500) ;
+        }
     }
 
     /**
@@ -73,5 +105,8 @@ class TypeController extends Controller
     {
         $typ = Type::findOrFail($type) ;
         $typ->delete() ;
+        return response()->json([
+            'message' => 'Type successfully deleted'
+        ],200) ;
     }
 }

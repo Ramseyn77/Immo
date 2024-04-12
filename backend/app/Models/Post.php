@@ -14,7 +14,6 @@ class Post extends Model
         'name', 'surface' ,'nbr_piece', 'prix' , 'description',
         'departement', 'ville' ,'quartier', 
         'categorie_id' ,'type_id','user_id' ,
-        'photos',
     ];
 
     public function users(){
