@@ -12,33 +12,37 @@ class AuthController extends Controller
     
     public function login(Request $request)
     {
-        $request->validate([
+        $credentials = $request->validate([
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required|string'
         ]) ;
-        $credentials = $request->only('email', 'password');
+    
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
             $token = $user->createToken('authToken')->accessToken;
-            return response()->json(['token' => $token], 200);
+            return response()->json([
+                'token' => $token,
+                'user' => $user
+            ], 200);
         }
         return response()->json(['message' => 'Unauthorized'], 401);
     }
 
     public function logout(Request $request)
     {
-       // Auth::logout() ;
        $request->user()->token()->revoke();
        return response()->json(['message' => 'Successfully logged out']);
     }
 
 
-    public function connectedUser()
-    {
-       $user = Auth::user() ;
-       return response()->json([
-        'user' => $user
-    ]) ;
+    private function code(){
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        $code = '';
+        $length = strlen($characters);
+        for ($i = 0; $i < 6; $i++) {
+            $code .= $characters[rand(0, $length - 1)];
+        }
+        return $code;
     }
 
 }

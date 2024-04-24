@@ -30,7 +30,7 @@ class PostRequest extends FormRequest
             'departement' => 'required|string',
             'ville' => 'required|string',
             'quartier' => 'required|string',
-            'photos.*' => 'image|mimes:jpeg,png,jpg,gif',
+            'photos.*' => 'required|image|mimes:jpeg,png,jpg,gif',
         ];
     }
 }

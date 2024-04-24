@@ -25,13 +25,12 @@ Route::get('/', function(){
 });
 
 
-Route::resource('users',UserController::class) ;
-Route::get('users/{user}/posts', [UserController::class, 'consultations'])->name('users.posts') ;
 
 
 
 
-Route::resource('consultations',PostUserController::class) ;
+
+
 
 
 

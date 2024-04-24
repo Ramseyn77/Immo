@@ -13,7 +13,9 @@ class PostUserController extends Controller
     public function index()
     {
         $consultations = PostUser::all() ;
-        dd($consultations) ;
+        return response()->json([
+            'consultations' => $consultations,
+        ],200) ;
     }
 
     /**
@@ -29,7 +31,19 @@ class PostUserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            PostUser::create([
+                'user_id' => $request->user_id,
+                'post_id'=> $request->post_id,
+            ]) ;
+            return response()->json([
+                'message' => 'Ressource was successffully created'
+            ],201) ;
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Something Really Went Wrong'
+            ],500) ;
+        }
     }
 
     /**
@@ -38,7 +52,9 @@ class PostUserController extends Controller
     public function show($consultation)
     {
         $consult = PostUser::findOrFail($consultation) ;
-        dd($consult) ;
+        return response()->json([
+            'consult' => $consult,
+        ],200) ;
     }
 
     /**
@@ -52,9 +68,22 @@ class PostUserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $consultation)
     {
-        //
+        try {
+            $consult = PostUser::findOrFail($consultation) ;
+            $consult->update([
+                'user_id' => $request->user_id,
+                'post_id'=> $request->post_id,
+            ]) ;
+            return response()->json([
+                'message' => 'Ressource was successffully updated'
+            ],201) ;
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Something Really Went Wrong'
+            ],500) ;
+        }
     }
 
     /**

@@ -61,9 +61,9 @@ class PostController extends Controller
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $image) {
                     $fileName = time().".".$image->getClientOriginalExtension() ;
-                    $image->move('uploads/', $fileName); 
+                    $path = $image->storeAs('uploads', $fileName); 
                     Image::create([
-                        'name' => $fileName,
+                        'name' => $path,
                         'post_id' => $post->id,
                     ]) ;
                     
@@ -115,31 +115,43 @@ class PostController extends Controller
     {
         
         try {
-            $poste = Post::findOrFail($post) ;
+            $request->validate([
+                'name' => 'required|string',
+                'surface' => 'required|string',
+                'nbr_piece' => 'required|string',
+                'prix' => 'required|string',
+                'description' => 'required|string',
+                'departement' => 'required|string',
+                'ville' => 'required|string',
+                'quartier' => 'required|string',
+                'photos.*' => 'image|mimes:jpeg,png,jpg,gif',
+            ]);
+            $poste = Post::findOrFail($post);
             $poste->update([
-                'name' => $request->name, 'surface' => $request->surface ,'nbr_piece' => $request->nbr_piece, 
-                'prix' => $request->prix , 'description' => $request->description,
-                'departement' => $request->departement, 'ville' => $request->ville ,'quartier' => $request->quartier, 
-                'categorie_id' => $request->categorie_id ,'type_id' => $request->type_id, 'user_id' => $request->user_id ,
-            ]) ;
-            // if ($request->hasFile('photos')) {
-            //     foreach ($poste->images as $image) {
-            //         Storage::delete('uploads/' . $image->name);
-            //     }
-            //     $poste->images()->delete();
-            //     foreach ($request->file('photos') as $image) {
-            //         $fileName = time().".".$image->getClientOriginalExtension() ;
-            //         $image->move('uploads/', $fileName); 
-            //         Image::create([
-            //             'name' => $fileName,
-            //             'post_id' => $poste->id,
-            //         ]) ;
-                    
-            //     }
-            // }
-            return response()->json(['message' => 'Post successfully updated'], 200);
+                'name' => $request->name, 'surface' => $request->surface, 'nbr_piece' => $request->nbr_piece,
+                'prix' => $request->prix, 'description' => $request->description, 'departement' => $request->departement,
+                'ville' => $request->ville, 'quartier' => $request->quartier, 'categorie_id' => $request->categorie_id,
+                'type_id' => $request->type_id, 'user_id' => $request->user_id,
+            ]);
+
+            if ($request->hasFile('photos')) {
+                foreach ($poste->images as $image) {
+                    Storage::delete($image->name);
+                }
+                $poste->images()->delete();
+                foreach ($request->file('photos') as $image) {
+                    $fileName = time().".".$image->getClientOriginalExtension() ;
+                    $path = $image->storeAs('uploads', $fileName); 
+                    Image::create([
+                        'name' => $path,
+                        'post_id' => $post->id,
+                    ]) ;
+                }
+            }
+
+            return response()->json(['message' => 'Article mis à jour avec succès'], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Something really went wrong'], 500);
+            return response()->json(['message' => 'Une erreur est survenue'], 500);
         }
     }
 
@@ -148,10 +160,18 @@ class PostController extends Controller
      */
     public function destroy($post)
     {
-        $poste = Post::findOrFail($post);
-        $poste->delete() ;
-        return response()->json([
-            'message' => "Post successfully deleted"
-        ],200) ;
+       try {
+            $poste = Post::findOrFail($post);
+            foreach ($poste->images as $image) {
+                Storage::delete($image->name);
+            }
+            $poste->images()->delete();
+            $poste->delete() ;
+            return response()->json([
+                'message' => "Post successfully deleted"
+            ],200) ;
+       } catch (\Exception $e) {
+            return response()->json(['message' => 'Une erreur est survenue'], 500);
+       }
     }
 }

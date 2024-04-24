@@ -36,7 +36,18 @@ class ProprietaireController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            Proprietaire::create([
+                'user_id' => $request->user_id ,
+            ]) ;
+            return response()->json([
+                'message' => 'Proprietaire successfully created'
+            ],200) ;
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Something Really went wrong'
+            ],500) ;
+        }
     }
 
     /**

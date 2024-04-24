@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\PostUserController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProprietaireController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TypeController;
@@ -22,6 +25,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::post('/login',[AuthController::class, 'login']) ;
+Route::delete('/logout',[AuthController::class, 'logout']) ;
+
+Route::resource('users',UserController::class) ;
+Route::post('users/storeCompany', [UserController::class, 'companyStore'] ) ;
+Route::put('users/{user}/editCompany', [UserController::class, 'updateCompany'] ) ;
+Route::get('users/{user}/posts', [UserController::class, 'consultations'])->name('users.posts') ;
+
 Route::resource('proprietaires',ProprietaireController::class) ;
 Route::get('proprietaires/{id}/posts',[ProprietaireController::class,'posts']) ;
 
@@ -34,3 +45,5 @@ Route::get('categories/{category}/posts',[CategorieController::class, 'posts'])-
 Route::resource('posts',PostController::class) ;
 Route::get('posts/{id}/owner', [PostController::class, 'owner'])->name('posts.owner') ;
 Route::get('posts/{id}/visitors', [PostController::class, 'visitors'])->name('posts.visitors') ;
+
+Route::resource('consultations',PostUserController::class) ;
